@@ -11,3 +11,4 @@ sbt-dist
 /.DS_STORE
 /.cache-main
 /.cache-tests
+/.DS_Store
