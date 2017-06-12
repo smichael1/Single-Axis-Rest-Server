@@ -1,10 +1,9 @@
 package controllers;
 
-import play.mvc.*;
 import play.libs.Json;
-
-import java.util.ArrayList;
-import java.util.List;
+import play.mvc.Controller;
+import play.mvc.Result;
+import services.UserStore;
 
 /**
  * This controller contains an action to handle HTTP requests
@@ -20,45 +19,14 @@ public class UserController extends Controller {
      */
     public Result getUsers()
     {
-        List<User> users = new ArrayList<User>();
-        User user = new User("Scott Michaels", "5/27/1999");
-        users.add(user);
-        return ok(Json.toJson(users));
+        return ok(Json.toJson(UserStore.getAllUsers()));
     }
     
     public Result getUser(int id) {
-    	
-    	// TODO: use the passed id to retrieve the correct record
-    	User user = new User("Scott Michaels", "5/27/1999");
-    	
-    	return ok(Json.toJson(user));
+    	   	
+    	return ok(Json.toJson(UserStore.getUser(id)));
     }
     
-    private class User {
-    
-        String name;
-        String dob;
-        
-        public User(String name, String dob) {
-            this.name = name;
-            this.dob = dob;
-        }
-        
-        public User() {}
-        
-        public String getName() {
-            return name;
-        }
-        public void setName(String name) {
-            this.name = name;
-        }
-        public String getDob() {
-            return dob;
-        }
-        public void setDob(String dob) {
-            this.dob = dob;
-        }
 
-    }
 
 }
