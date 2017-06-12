@@ -1,0 +1,8 @@
+# Routes
+# This file defines all application routes (Higher priority routes first)
+# ~~~~
+
+# Example REST service returning a list of users
+GET     /users                      controllers.UserController.getUsers
+
+GET 	/user/:id					controllers.UserController.getUser(id:Int)

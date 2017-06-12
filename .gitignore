@@ -1,0 +1,13 @@
+logs
+bin
+target
+sbt-dist
+/.idea
+/.idea_modules
+/.classpath
+/.project
+/.settings
+/RUNNING_PID
+/.DS_STORE
+/.cache-main
+/.cache-tests
