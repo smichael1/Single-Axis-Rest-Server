@@ -23,7 +23,8 @@ public class UserController extends Controller {
     }
     
     public Result getUser(int id) {
-    	   	
+    	 
+    	// a comment to test project move
     	return ok(Json.toJson(UserStore.getUser(id)));
     }
     
