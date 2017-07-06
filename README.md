@@ -12,6 +12,7 @@ sbt run
 ```
 
 And then go to http://localhost:9000/commands to see the JSON metadata output.
+
 Use ws://localhost:9000/ws to request a websocket connection.
 
 
@@ -22,6 +23,7 @@ Two controller are used:
 - CommandController.java:
 
   getCommands() - Returns a JSON metadata for commands and arguments.
+  
   runCommand() - Accepts a JSON POST of setupConfig command name and argument name-value pairs
   
 - WebsocketController.java
