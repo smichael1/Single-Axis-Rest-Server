@@ -1,8 +1,8 @@
 
 
-# Play Java REST Starter
+# Single Axis REST Server
 
-This is a starter application that shows the simplest possible REST implementation in Play using Java.
+This is an implementation of a REST and Websockets server using Java/Play.  The server will provide a client with metadata of setupConfig commands and arguments available (can be used by the client to generate a user interface), accepts setupConifg command execution requests and provides telemetry to clients using WebSockets.
 
 ## Running
 
@@ -15,11 +15,21 @@ And then go to http://localhost:9000/users to see the JSON output.
 
 ## Controllers
 
-One controller is used for the two routes:
+Two controller are used:
 
-- UserController.java:
+- CommandController.java:
 
-  getUsers() - Returns a JSON list of User data objects.
-  getUser(id) - Returns JSON for a single user data object.
+  getCommands() - Returns a JSON metadata for commands and arguments.
+  runCommand() - Accepts a JSON POST of setupConfig command name and argument name-value pairs
+  
+- WebsocketController.java
+
+  ws() - creates a websocket server that accepts connection requests.
+  
+## Actors
+
+WebSocketActor - broadcasts received akka messages as JSON to websocket clients
+
+TelemetryActor - listens for telemetry from CSW and sends akka messages to the websocketActor for publishing to clients
 
 # Single-Axis-Rest-Server
