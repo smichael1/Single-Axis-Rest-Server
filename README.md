@@ -11,7 +11,9 @@ Run this using [sbt](http://www.scala-sbt.org/).
 sbt run
 ```
 
-And then go to http://localhost:9000/users to see the JSON output.
+And then go to http://localhost:9000/commands to see the JSON metadata output.
+Use ws://localhost:9000/ws to request a websocket connection.
+
 
 ## Controllers
 
