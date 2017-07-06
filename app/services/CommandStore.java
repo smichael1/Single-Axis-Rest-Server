@@ -13,9 +13,12 @@ public class CommandStore {
 
 	static {
 		
-        Command command = new Command("Init Cmd", "Busy", "Init");
+		CommandArg[] args1 = {};
+        Command command = new Command("Init Cmd", "Busy", "Init", args1);
         commands.put(1, command);
-        command = new Command("Position Cmd", "Ready", "Position");
+        
+        CommandArg[] args2 = {new CommandArg("position", "0")};
+        command = new Command("Position Cmd", "Ready", "Position", args2);
         commands.put(2, command);
 
 	}

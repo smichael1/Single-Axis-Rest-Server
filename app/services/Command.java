@@ -5,11 +5,13 @@ public class Command {
     String commandName;
     String commandState;
     String commandSetupConfig;
+    CommandArg[] commandArgs;
     
-    public Command(String commandName, String commandState, String commandSetupConfig) {
+    public Command(String commandName, String commandState, String commandSetupConfig, CommandArg[] commandArgs) {
         this.commandName = commandName;
         this.commandState = commandState;
         this.commandSetupConfig = commandSetupConfig;
+        this.commandArgs = commandArgs;
     }
     
     public Command() {}
@@ -25,5 +27,9 @@ public class Command {
     public String getCommandSetupConfig() {
     	return commandSetupConfig;
     }
+
+	public CommandArg[] getCommandArgs() {
+		return commandArgs;
+	}
 
 }
