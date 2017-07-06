@@ -2,7 +2,12 @@
 # This file defines all application routes (Higher priority routes first)
 # ~~~~
 
-# Example REST service returning a list of users
-GET     /users                      controllers.UserController.getUsers
+# Example REST service returning a list of commands
+GET     /commands                      controllers.CommandController.getCommands
 
-GET 	/user/:id					controllers.UserController.getUser(id:Int)
+GET 	/command/:id					controllers.CommandController.getCommand(id:Int)
+
+POST	/command				controllers.CommandController.runCommand
+
+# Websockets connection
+GET     /ws                      controllers.WebsocketController.ws
