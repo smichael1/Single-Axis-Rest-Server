@@ -13,8 +13,6 @@ public class TelemetryActor extends UntypedActor {
 	// set up telemetry
 	ActorRef websocketActor = ActorRefStore.actorRef;
 
-    
-	
 	
     public void onReceive(Object message) throws Exception {
     	

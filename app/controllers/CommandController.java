@@ -53,6 +53,16 @@ public class CommandController extends Controller {
     	    return badRequest("Expecting Json data");
     	  } else {
     	    String setupConfig = json.findPath("commandSetupConfig").textValue();
+    	    JsonNode argsNode = json.findPath("commandArgs");
+
+    	    for (JsonNode commandArg : json.withArray("commandArgs")) {
+    	        System.out.println("commandArg name -> " + commandArg.get("argName").asText());
+    	        System.out.println("commandArg value -> " + commandArg.get("argValue").asText());
+    	        //do something else
+    	    }
+    	    
+    	    
+    	    
     	    if(setupConfig == null) {
     	      return badRequest("Missing parameter [commandSetupConfig]");
     	    } else {
