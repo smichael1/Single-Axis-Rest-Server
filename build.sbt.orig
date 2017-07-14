@@ -1,0 +1,30 @@
+import sbt._
+
+import Dependencies._
+//import Settings._
+
+def compile(deps: ModuleID*): Seq[ModuleID] = deps map (_ % "compile")
+
+scalaVersion := "2.11.11"
+
+lazy val root = (project in file(".")).enablePlugins(PlayJava)
+//	.settings(defaultSettings: _*)
+
+//	.settings(
+//		libraryDependencies ++= compile(filters, pkg, ccs, loc, seqSupport, javaWs)
+//	)
+//    .enablePlugins(PlayJava)
+   
+libraryDependencies += filters
+libraryDependencies += pkg
+libraryDependencies += ccs
+libraryDependencies += loc
+libraryDependencies += seqSupport
+libraryDependencies += javaWs
+libraryDependencies += cache   
+   
+   
+
+// filters, javaWs, cache
+
+

@@ -1,3 +1,5 @@
+import Dependencies._
+
 name := """play-java"""
 
 version := "1.0-SNAPSHOT"
@@ -8,8 +10,12 @@ scalaVersion := "2.11.11"
 
 
 
-libraryDependencies += cache
-libraryDependencies += javaWs
 libraryDependencies += filters
-
-
+libraryDependencies += pkg
+libraryDependencies += ccs
+libraryDependencies += loc
+libraryDependencies += seqSupport
+libraryDependencies += javaWs
+libraryDependencies += cache
+libraryDependencies += singleaxis
+libraryDependencies += javacsw
