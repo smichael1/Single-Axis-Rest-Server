@@ -9,9 +9,11 @@ import akka.actor.*;
 import akka.japi.Creator;
 import akka.japi.pf.ReceiveBuilder;
 import csw.util.config.ChoiceKey;
+import csw.util.config.DoubleKey;
 import csw.util.config.ChoiceItem;
 import csw.util.config.IntKey;
 import csw.util.config.IntItem;
+import csw.util.config.DoubleItem;
 import csw.util.config.Choice;
 import csw.util.config.Events;
 import javacsw.util.config.JItems;
@@ -34,11 +36,17 @@ public class TelemetrySubscriberActor extends AbstractActor {
 	private String cmdState = "unknown";
 	private String moveState = "unknown";
 	private String position = "unknown";
+	private String posUnits = "unknown";
+	private String stagePosition = "unknown";
+	private String stagePosUnits = "unknown";
+	private String axisStateString = "unknown";
 	
 	
 	public static final ChoiceKey cmdKey = ChoiceKey("cmd");
 	public static final ChoiceKey moveKey = ChoiceKey("move");
 	public static final IntKey posKey = IntKey("position");
+	public static final DoubleKey stagePosKey = DoubleKey("stagePosition");
+	public static final ChoiceKey axisStateKey = ChoiceKey("axisState");
 	
    
     public static Props props() {
@@ -91,7 +99,7 @@ public class TelemetrySubscriberActor extends AbstractActor {
 		
 					cmdState = jvalue(cmdItem).toString();
 					moveState = jvalue(moveItem).toString();
-				
+					
 					System.out.println("cmdState: " + cmdState.toString());
 					System.out.println("moveState: " + moveState.toString());
 					
@@ -104,16 +112,27 @@ public class TelemetrySubscriberActor extends AbstractActor {
 					// update axis telemetry
 
 					IntItem posItem = jitem(event, posKey);
+					DoubleItem stagePosItem = jitem(event, stagePosKey);
+					
+					ChoiceItem axisStateItem = jitem(event, axisStateKey);
 		
+					Choice axisState = jvalue(axisStateItem);
+					
+					axisStateString = axisState.toString();
+					posUnits = posItem.units().toString();
+					stagePosUnits = stagePosItem.units().toString();
+				
+					System.out.println("axisState: " + axisState.toString());
+				
+					
 					position = jvalue(posItem).toString();
+					stagePosition = jvalue(stagePosItem).toString();
 									
 					String sendString = generateJsonStringFromState();
 					
 					websocketActor.tell(sendString, self());
 
 				}
-				
-				
 				
 
 			}).
@@ -128,24 +147,41 @@ public class TelemetrySubscriberActor extends AbstractActor {
     	ArrayNode array = Json.newArray();
     	
     	ObjectNode node1 = Json.newObject();
+    	node1.put("source", "SingleAxisAssembly");
     	node1.put("field", "commandState");
     	node1.put("value", cmdState);
     	node1.put("units", "");
     	
     	ObjectNode node2 = Json.newObject();
+    	node2.put("source", "SingleAxisAssembly");
     	node2.put("field", "moveState");
     	node2.put("value", moveState);
     	node2.put("units", "");
     	
-    	ObjectNode node3 = Json.newObject();
-    	node3.put("field", "stagePosition");
+       	ObjectNode node3 = Json.newObject();
+    	node3.put("source", "GalilHCD");
+    	node3.put("field", "encPosition");
     	node3.put("value", position);
-    	node3.put("units", "meters");
+    	node3.put("units", posUnits);
+    	
+       	ObjectNode node4 = Json.newObject();
+    	node4.put("source", "SingleAxisAssembly");
+    	node4.put("field", "stagePosition");
+    	node4.put("value", stagePosition);
+    	node4.put("units", stagePosUnits);
+    	
+       	ObjectNode node5 = Json.newObject();
+    	node5.put("source", "GalilHCD");
+    	node5.put("field", "axisState");
+    	node5.put("value", axisStateString);
+    	node5.put("units", "");
     	
     	array.add(node1);
     	array.add(node2);
-    	array.add(node3);
-    	    
+       	array.add(node4);
+       	array.add(node3);
+       	array.add(node5);
+           	    
     	return array.toString();
 	}
 	

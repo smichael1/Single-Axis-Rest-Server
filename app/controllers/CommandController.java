@@ -81,11 +81,7 @@ public class CommandController extends Controller {
         return ok(Json.toJson(CommandStore.getAllCommands()));
     }
     
-    public Result getCommand(int id) {
-    	 
-    	// a comment to test project move
-    	return ok(Json.toJson(CommandStore.getCommand(id)));
-    }
+
     
     public Result runCommand() {
     	

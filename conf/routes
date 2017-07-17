@@ -5,7 +5,6 @@
 # Example REST service returning a list of commands
 GET     /commands                      controllers.CommandController.getCommands
 
-GET 	/command/:id					controllers.CommandController.getCommand(id:Int)
 
 POST	/command				controllers.CommandController.runCommand
 

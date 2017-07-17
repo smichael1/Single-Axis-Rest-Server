@@ -1,35 +1,28 @@
 package services;
 
-import java.util.TreeMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class CommandStore {
 
-	private static Map<Integer, Command> commands = new TreeMap<>();
+	private static List<Command> commands = new ArrayList<Command>();
 	 
 
 	static {
 		
 		CommandArg[] args1 = {};
-        Command command = new Command("Init Cmd", "Busy", "Init", args1);
-        commands.put(1, command);
+        Command command = new Command("Init Cmd", "Ready", "Init", args1);
+        commands.add(command);
         
         CommandArg[] args2 = {new CommandArg("position", "0")};
         command = new Command("Position Cmd", "Ready", "Position", args2);
-        commands.put(2, command);
+        commands.add(command);
 
 	}
-	
-    public static Command getCommand(int id) {
-        return commands.get(id);
-    }
  
-    public static Set<Command> getAllCommands() {
-    	// TODO: order these by index
-        return new HashSet<Command>(commands.values());
+    public static List<Command> getAllCommands() {
+        return commands;
     }
 	
 	
