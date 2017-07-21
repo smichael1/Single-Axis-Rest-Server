@@ -18,10 +18,18 @@ import csw.util.config.Choice;
 import csw.util.config.Events;
 import javacsw.util.config.JItems;
 import play.libs.Json;
-import services.ActorRefStore;
 import scala.collection.JavaConversions;
+import scala.concurrent.Await;
+
 import static javacsw.util.config.JItems.*;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+
+import akka.dispatch.*;
+import akka.util.*;
+import scala.concurrent.duration.Duration;
+import scala.concurrent.Future;
 
 //import csw.services.ccs.BlockingAssemblyClient;
 //import csw.services.sequencer.SequencerEnv;
@@ -33,6 +41,7 @@ public class TelemetrySubscriberActor extends AbstractActor {
     //    return Props.create(TelemetrySubscriberActor.class);
     //}
     
+	
 	private String cmdState = "unknown";
 	private String moveState = "unknown";
 	private String position = "unknown";
@@ -48,15 +57,11 @@ public class TelemetrySubscriberActor extends AbstractActor {
 	public static final DoubleKey stagePosKey = DoubleKey("stagePosition");
 	public static final ChoiceKey axisStateKey = ChoiceKey("axisState");
 	
-   
+    private ActorRef websocketActor;
+	
+	
     public static Props props() {
-    	return Props.create(new Creator<TelemetrySubscriberActor>() {
-    		private static final long serialVersionUID = 1L;
-    		@Override
-    		public TelemetrySubscriberActor create() throws Exception {
-    			return new TelemetrySubscriberActor();
-    		}
-    	});
+    	return Props.create(TelemetrySubscriberActor.class);
     }
     
 	// --- Actor message classes ---
@@ -74,71 +79,96 @@ public class TelemetrySubscriberActor extends AbstractActor {
 	Vector<Events.EventServiceEvent> msgs = new Vector<>();
     
 	
-	// set up telemetry
-	ActorRef websocketActor = ActorRefStore.actorRef;
-
 	
-	public TelemetrySubscriberActor() throws Exception {
+	public Receive createReceive() {
+
+		return receiveBuilder().
+				match(Events.SystemEvent.class, event -> {
+
+					msgs.add(event);
+					System.out.println("RECEIVED System " + event.info().source() + " event: " + event);
+				}).
+				match(Events.StatusEvent.class, event -> {
+					
+					System.out.println("RECEIVED Status " + event.info().source() + " event: " + event);
+					
+					websocketActor = resolveWebsocketActor();
+					
+					if (event.prefix().endsWith(".state")) {
+						// update command state telemetry
+						
+						ChoiceItem cmdItem = jitem(event, cmdKey);
+						ChoiceItem moveItem = jitem(event, moveKey);
+			
+						cmdState = jvalue(cmdItem).toString();
+						moveState = jvalue(moveItem).toString();
+						
+						System.out.println("cmdState: " + cmdState.toString());
+						System.out.println("moveState: " + moveState.toString());
+						
+						String sendString = generateJsonStringFromState();
+						
+						//ActorRef websocketActor = ActorRefStore.actorRef;
+						websocketActor.tell(sendString, self());
+						
+						
+					} else if (event.prefix().endsWith(".axis1State")) {
+						// update axis telemetry
+
+						IntItem posItem = jitem(event, posKey);
+						DoubleItem stagePosItem = jitem(event, stagePosKey);
+						
+						ChoiceItem axisStateItem = jitem(event, axisStateKey);
+			
+						Choice axisState = jvalue(axisStateItem);
+						
+						axisStateString = axisState.toString();
+						posUnits = posItem.units().toString();
+						stagePosUnits = stagePosItem.units().toString();
+					
+						System.out.println("axisState: " + axisState.toString());
+					
+						
+						position = jvalue(posItem).toString();
+						stagePosition = jvalue(stagePosItem).toString();
+										
+						String sendString = generateJsonStringFromState();
+						
+						//ActorRef websocketActor = ActorRefStore.actorRef;
+						websocketActor.tell(sendString, self());
+
+					}
+					
+
+				}).
+				match(GetResults.class, t -> sender().tell(new Results(msgs), self())).
+				matchAny(t -> System.out.println("Unknown message received: " + t)).
+				build();
 		
-		receive(ReceiveBuilder.
-			match(Events.SystemEvent.class, event -> {
-
-				msgs.add(event);
-				System.out.println("RECEIVED System " + event.info().source() + " event: " + event);
-			}).
-			match(Events.StatusEvent.class, event -> {
-				
-				System.out.println("RECEIVED Status " + event.info().source() + " event: " + event);
-				
-				
-				if (event.prefix().endsWith(".state")) {
-					// update command state telemetry
-					
-					ChoiceItem cmdItem = jitem(event, cmdKey);
-					ChoiceItem moveItem = jitem(event, moveKey);
+	}
+	
+	
+	private ActorRef resolveWebsocketActor() {
 		
-					cmdState = jvalue(cmdItem).toString();
-					moveState = jvalue(moveItem).toString();
-					
-					System.out.println("cmdState: " + cmdState.toString());
-					System.out.println("moveState: " + moveState.toString());
-					
-					String sendString = generateJsonStringFromState();
-					
-					websocketActor.tell(sendString, self());
-					
-					
-				} else if (event.prefix().endsWith(".axis1State")) {
-					// update axis telemetry
-
-					IntItem posItem = jitem(event, posKey);
-					DoubleItem stagePosItem = jitem(event, stagePosKey);
-					
-					ChoiceItem axisStateItem = jitem(event, axisStateKey);
+		if (websocketActor != null) {
+			return websocketActor;
+		}
 		
-					Choice axisState = jvalue(axisStateItem);
-					
-					axisStateString = axisState.toString();
-					posUnits = posItem.units().toString();
-					stagePosUnits = stagePosItem.units().toString();
-				
-					System.out.println("axisState: " + axisState.toString());
-				
-					
-					position = jvalue(posItem).toString();
-					stagePosition = jvalue(stagePosItem).toString();
-									
-					String sendString = generateJsonStringFromState();
-					
-					websocketActor.tell(sendString, self());
+		 try {
+				Timeout timeout = new Timeout(Duration.create(5, "seconds"));
+	            // create an ActorSelection based on the path
+	            ActorSelection sel = context().actorSelection("../*/flowActor*");
+	            // check if a single actor exists at the path
+	            Future<ActorRef> fut = sel.resolveOne(timeout);
+	            ActorRef ref = Await.result(fut, timeout.duration());
+	            System.out.println("ref = " + ref);
+	          
+	            return ref;
+	        } catch (Exception e) {
+	        	System.out.println(e);
+	           return null;
+	        }
 
-				}
-				
-
-			}).
-			match(GetResults.class, t -> sender().tell(new Results(msgs), self())).
-			matchAny(t -> System.out.println("Unknown message received: " + t)).
-			build());
 	}
 	
 	

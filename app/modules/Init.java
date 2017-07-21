@@ -1,4 +1,4 @@
-package app.modules;
+package modules;
 
 public interface Init {
 	

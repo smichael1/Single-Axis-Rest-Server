@@ -1,43 +1,28 @@
 package controllers;
 
-import play.libs.Json;
-
-import play.mvc.Controller;
-import play.mvc.Result;
-import services.ActorRefStore;
-import services.CommandStore;
-
-import com.fasterxml.jackson.databind.JsonNode;
-
-import actors.MyWebsocketActor;
+import play.libs.streams.ActorFlow;
+import play.mvc.*;
 import akka.actor.*;
-import play.libs.F.*;
-import play.mvc.WebSocket;
-import play.mvc.LegacyWebSocket;
-import scala.concurrent.duration.Duration;
-import java.util.concurrent.TimeUnit;
+import akka.stream.*;
+import javax.inject.Inject;
+import actors.*;
 
-
-
-
-
-/**
- * This controller contains an action to handle HTTP requests
- * to the application's home page.
- */
 public class WebsocketController extends Controller {
 
+    private final ActorSystem actorSystem;
+    private final Materializer materializer;
 
-    
-	public LegacyWebSocket<String> ws() {
-		System.out.println("ws method called");
-		
-	    LegacyWebSocket websocket = WebSocket.withActor(MyWebsocketActor::props);
-	    
-	    return websocket;
-	    
-	    
-	}
-	
+    @Inject
+    public WebsocketController(ActorSystem actorSystem, Materializer materializer) {
+        this.actorSystem = actorSystem;
+        this.materializer = materializer;
+    }
 
+    public WebSocket ws() {
+        return WebSocket.Text.accept(request ->
+                ActorFlow.actorRef(MyWebsocketActor::props,
+                    actorSystem, materializer
+                )
+        );
+    }
 }

@@ -1,4 +1,4 @@
-package app.modules;
+package modules;
 
 import csw.services.ccs.BlockingAssemblyClient;
 import csw.services.loc.LocationService;
