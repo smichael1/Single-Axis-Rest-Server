@@ -7,6 +7,7 @@ import java.util.List;
 public class CommandStore {
 
 	private static List<Command> commands = new ArrayList<Command>();
+	private static List<ConfigElement> configs = new ArrayList<ConfigElement>();
 	 
 
 	static {
@@ -21,9 +22,23 @@ public class CommandStore {
 
 	}
  
+	static {
+		
+		configs.add(new ConfigElement("positionScale", "8.0"));
+		configs.add(new ConfigElement("stageZero", "90.0"));
+		configs.add(new ConfigElement("minStageEncoder", "225"));
+		configs.add(new ConfigElement("minEncoderLimit", "200"));
+		configs.add(new ConfigElement("maxEncoderLimit", "1200"));
+
+	}
+	
+	
     public static List<Command> getAllCommands() {
         return commands;
     }
 	
+    public static List<ConfigElement> getAllConfigs() {
+    	return configs;
+    }
 	
 }

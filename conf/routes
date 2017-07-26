@@ -10,3 +10,5 @@ POST	/command				controllers.CommandController.runCommand
 
 # Websockets connection
 GET     /ws                      controllers.WebsocketController.ws
+
+GET     /configs/:file           controllers.ConfigController.getConfigs(file: String)
