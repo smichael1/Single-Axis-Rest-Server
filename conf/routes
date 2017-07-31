@@ -12,3 +12,5 @@ POST	/command				controllers.CommandController.runCommand
 GET     /ws                      controllers.WebsocketController.ws
 
 GET     /configs/:file           controllers.ConfigController.getConfigs(file: String)
+
+POST	/configs			 controllers.ConfigController.updateConfigs()

@@ -30,6 +30,7 @@ import akka.dispatch.*;
 import akka.util.*;
 import scala.concurrent.duration.Duration;
 import scala.concurrent.Future;
+import services.ActorRefStore;
 
 //import csw.services.ccs.BlockingAssemblyClient;
 //import csw.services.sequencer.SequencerEnv;
@@ -150,6 +151,12 @@ public class TelemetrySubscriberActor extends AbstractActor {
 	
 	private ActorRef resolveWebsocketActor() {
 		
+		return ActorRefStore.actorRef;
+		
+	}
+	
+	private ActorRef resolveWebsocketActorDeprecated() {
+		
 		if (websocketActor != null) {
 			return websocketActor;
 		}
@@ -169,6 +176,7 @@ public class TelemetrySubscriberActor extends AbstractActor {
 	           return null;
 	        }
 
+	      
 	}
 	
 	

@@ -18,6 +18,7 @@ import play.libs.Json;
 import scala.concurrent.Await;
 import scala.concurrent.Future;
 import scala.concurrent.duration.Duration;
+import services.ActorRefStore;
 import services.Command;
 
 
@@ -106,9 +107,15 @@ public class CommandActor extends UntypedActor {
         
     }
     
-    
-    
 	private ActorRef resolveWebsocketActor() {
+		
+		return ActorRefStore.actorRef;
+		
+	}
+
+    
+    
+	private ActorRef resolveWebsocketActorDeprecated() {
 		
 		if (websocketActor != null) {
 			return websocketActor;
