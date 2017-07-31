@@ -11,7 +11,13 @@ import akka.actor.UntypedActor;
 import akka.util.Timeout;
 import csw.services.ccs.BlockingAssemblyClient;
 import csw.services.ccs.CommandStatus.CommandResult;
+import csw.services.ccs.CommandStatus.CommandResults;
+import csw.services.ccs.CommandStatus.CommandStatus;
+import csw.services.ccs.CommandStatus.Invalid;
 import csw.services.ccs.CommandStatus.OverallCommandStatus;
+import csw.services.ccs.Validation;
+import csw.services.ccs.Validation.ValidationIssue;
+//import javacsw.services.ccs.JValidation.Invalid;
 import csw.services.loc.LocationService;
 import csw.services.sequencer.SequencerEnv;
 import play.libs.Json;
@@ -96,12 +102,25 @@ public class CommandActor extends UntypedActor {
         	node2.put("commandSetupConfig", command.getCommandSetupConfig());
         	node2.put("overallStatus", overall.toString());
 
-     		websocketActor.tell(node2.toString(), self());
     		
     		System.out.println(command.getCommandSetupConfig() + " command completed: status = " + overall);
+    		   		
+    		System.out.println("command status = " + commandResult.details().getResults().get(0).first());
+        	
+    		CommandStatus status = commandResult.details().getResults().get(0).first();
+    		
+    		if (status instanceof Invalid) {
+    			Invalid invalid = (Invalid)status;
+    			ValidationIssue issue = invalid.issue();
+    			
+    			System.out.println("issue  = " + issue.reason());
+    			
+    			node2.put("detail", issue.reason());
+    		}
+    		
+   		
+     		websocketActor.tell(node2.toString(), self());
 
-        	
-        	
         	
         }
         
